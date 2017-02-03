@@ -1,0 +1,44 @@
+THIS LINE IS IGNORED
+  generations: 1
+  extrainds: 0
+  population_size: 1
+  mutation_rate: 0.2
+  elite_percentage: 0.05
+  tabulated_parameters: 0
+  nontabulated_parameters: 10
+  M: 5
+  N: 0
+  force_weight: 0.2
+  energy_weight: 0
+  energy_shape_weight: 0.4
+  stress_weight: 0.4
+  pressure_weight: 0
+  pressure_shape_weight: 0
+  intervals:                   0 4    0 1        0 50    0.01 10     0.01 10      0 50      0 50       0.01 50    1e-3 5    1e-3 5 
+  decimal_place_accuracies:     2      2         2        2             2           2       2            2         2         2          
+----------------------------------------LAMMPS SETUP COMMANDS
+    log none  
+    neighbor 1.0 multi  
+    boundary p p p  
+    units metal  
+    atom_style hybrid atomic charge
+    atom_modify map array # This is required  
+
+    ### Declare the box
+    region box prism 0 1 0 1 0 1 0 0 0 units lattice  
+    create_box 1 box  
+
+    ### Create atom type 1 in the box
+    create_atoms 1 random 17 1919191 NULL # Positions don't matter... just declare the memory
+    mass 1 69.7 #Ge
+    compute P all pe  
+    compute S all pressure thermo_temp  
+----------------------------------------LAMMPS PAIR STYLE COMMANDS
+
+  pair_style hybrid/overlay morse [] born 12 coul/dsf 0.25 12
+  set type 1 charge []
+  pair_coeff 1 1 coul/dsf
+  pair_coeff 1 1 born [] [] [] [] []
+  pair_coeff 1 1 morse [] [] []
+
+----------------------------------------END OF FILE

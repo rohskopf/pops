@@ -1,0 +1,32 @@
+newton on
+boundary	 	 p p p
+units	 	 	 metal
+atom_style	 	 charge
+
+read_data DATA
+
+neighbor    0.01 bin
+neigh_modify once yes
+pair_style coul/dsf 0.25 12
+set type 1 charge 2
+set type 2 charge -2
+pair_coeff * * 
+
+# Initialize velocity, thermo settings, timestep and ensemble
+velocity	 all create 300 20101 rot yes mom yes
+thermo  	 100
+thermo_style custom step pe temp #ke press vol temp
+fix 1 all nve
+timestep  0.0005
+
+# Run MD	 	 	 	 	  
+dump 1 all xyz 100 dump.xyz	
+dump 2 all custom 100 dump.forces fx fy fz 
+#dump 3 all custom 1 dump.coords type xs ys zs
+#dump_modify 3 format float %20.15g scale yes
+dump_modify 2 sort id
+run 0
+unfix 1
+undump 1
+
+#write_data Si.data

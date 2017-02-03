@@ -1,0 +1,18 @@
+Master process: 0
+Number of elements per proc: 2
+Number of procs: 1
+Number of unknowns: 2
+Generation 1 started
+sum_f_diff: 0.0782528
+Z_f: 0.00040762
+sum_e_diff: 3.02525e+10
+Z_e: 473.159
+sum_e_diff_s: 3.02525e+10
+Z_e_s: 0.000638418
+sum_s_diff: 1.36009e+09
+Z_s: 0.0575746
+sum_p_diff: 1.36009e+09
+Z_p: 342993
+Z_2_f: 0.270638
+Z_2_e: 99.6812
+Z: 0.0176039

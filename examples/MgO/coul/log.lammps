@@ -1,0 +1,75 @@
+LAMMPS (17 Nov 2016)
+newton on
+boundary	 	 p p p
+units	 	 	 metal
+atom_style	 	 charge
+
+read_data DATA
+  triclinic box = (0 0 0) to (8.482 8.482 8.482) with tilt (0 0 0)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  64 atoms
+
+neighbor    0.01 bin
+neigh_modify once yes
+pair_style coul/dsf 0.25 12
+set type 1 charge 2
+  32 settings made for charge
+set type 2 charge -2
+  32 settings made for charge
+pair_coeff * *
+
+# Initialize velocity, thermo settings, timestep and ensemble
+velocity	 all create 300 20101 rot yes mom yes
+thermo  	 100
+thermo_style custom step pe temp #ke press vol temp
+fix 1 all nve
+timestep  0.0005
+
+# Run MD
+dump 1 all xyz 100 dump.xyz
+dump 2 all custom 100 dump.forces fx fy fz
+#dump 3 all custom 1 dump.coords type xs ys zs
+#dump_modify 3 format float %20.15g scale yes
+dump_modify 2 sort id
+run 0
+Neighbor list info ...
+  1 neighbor list requests
+  update every 1 steps, delay 10 steps, check yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 12.01
+  ghost atom cutoff = 12.01
+  binsize = 6.005 -> bins = 2 2 2
+Memory usage per processor = 4.89569 Mbytes
+Step PotEng Temp 
+       0   -1518.9944          300 
+Loop time of 9.53674e-07 on 1 procs for 0 steps with 64 atoms
+
+0.0% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0          | 0          | 0          |   0.0 |  0.00
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0          | 0          | 0          |   0.0 |  0.00
+Output  | 0          | 0          | 0          |   0.0 |  0.00
+Modify  | 0          | 0          | 0          |   0.0 |  0.00
+Other   |            | 9.537e-07  |            |       |100.00
+
+Nlocal:    64 ave 64 max 64 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:    3311 ave 3311 max 3311 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:    24000 ave 24000 max 24000 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 24000
+Ave neighs/atom = 375
+Neighbor list builds = 0
+Dangerous builds = 0
+unfix 1
+undump 1
+
+#write_data Si.data
+Total wall time: 0:00:00

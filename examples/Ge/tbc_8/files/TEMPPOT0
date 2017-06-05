@@ -1,4 +1,0 @@
-# Example of a Tersoff potential file for fitting
-#   m, Inmma, lambda3, c, d, costheta0, n, beta, lambda2, B, R, D, lambda1, A
-Ge Ge Ge 3 1  2.950000  0.680000  2.170000  7.790000  4.790000  16.060000  17.060000  28.930000  2.95  0.15 1.290000  0.970000 
-

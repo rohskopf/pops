@@ -1,3 +1,3 @@
-This is the git repo for the POPS code. 
+This is POPS version 0.0
 
-Updated examples and source code can be found here
+Recent changes involved a restructure of the entire code into separate classes. The code is now modular and object oriented. 

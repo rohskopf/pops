@@ -101,11 +101,16 @@ POPS::POPS(int narg, char **arg)
   //{
     ga->initialize();;
   //}
-
+  double *xpop_r = NULL;
+  popsmemory->allocate(sub_xpop_r, nepp);
+  for (int i=0; i<nepp; i++)
+  {
+    sub_xpop_r[i] = 0.0;
+  }
   while (g <= gen_num)
   {
 
-  double *xpop_r = NULL;
+  //double *xpop_r = NULL;
   //double *sub_xpop_r = (double *)malloc(sizeof(double) * nepp);
   //if (rank == 0) 
   //{
@@ -115,7 +120,7 @@ POPS::POPS(int narg, char **arg)
     //MPI_Scatter(xpop_r, nepp, MPI::DOUBLE, sub_xpop_r, nepp, MPI::DOUBLE, 0, MPI_COMM_WORLD);
   //}
 
-  double *sub_xpop_r = (double *)malloc(sizeof(double) * nepp);
+  //double *sub_xpop_r = (double *)malloc(sizeof(double) * nepp);
     
   // Scatter the random numbers from the root process to all processes in the MPI world
   //cout << "Scatter parameters" << endl; 
@@ -168,6 +173,7 @@ POPS::POPS(int narg, char **arg)
 
   g++;
   }
+  popsmemory->deallocate(sub_xpop_r);
 
   // Delete dynamically allocated pointers
   finalize();

@@ -45,6 +45,7 @@ namespace POPS_NS
 
         int g; //generation number
         int gen_num;
+        double *sub_xpop_r;
 
         std::string mode;
     };

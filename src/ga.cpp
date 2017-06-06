@@ -368,10 +368,13 @@ void Ga::selection()
     end(sorted_indices),
     [&](int i1, int i2) { return Z_vec[i1] < Z_vec[i2]; } );
 
+  //cout << "Z_vec[0]: " << Z_vec[0] << endl;
+
   // Now "sorted_indices" contains the indices of the sorted Z_vec, but we still have to sort Z_vec:
   sort(Z_vec.begin(), Z_vec.end(), [](double a, double b) {
     return b > a;
   });
+  //cout << "Z_vec[0]: " << Z_vec[0] << endl;
   // Sort Zf2_vec
   sort(Zf2_vec.begin(), Zf2_vec.end(), [](double a, double b) {
     return b > a;
@@ -432,6 +435,7 @@ void Ga::selection()
     val_str = to_string(value);
     fprintf(individuals, "param %d: %.6f\n", u+1, value);
   }
+  fprintf(individuals, "Z: %.6f\n", Z_vec[0]);
 
   // "sorted_xpop" and Z_vec are now sorted from lowest to highest, as to find the minimum
   /*for (int i=0; i <= pop_size - 1; i++)

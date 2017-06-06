@@ -486,7 +486,7 @@ double Objfun::calcz(double params[], int ind)
   double *sio = pops->popsinput->sio;
   double *pio = pops->popsinput->pio;
   double *pio_s = pops->popsinput->pio_s;
-
+ 
   // Calculate MD quantities and compare to reference quantities
   double sum_f_diff=0;
   double sum_e_diff=0;
@@ -710,7 +710,7 @@ double Objfun::calcz(double params[], int ind)
     double denom;
     double fio_x, fio_y, fio_z;
     //debug << "Natoms: " << Natoms << endl;
-    pops->popsmemory->allocate(fi, pops->popsinput->M_in*pops->popsinput->N_tot*3);
+    //pops->popsmemory->allocate(fi, pops->popsinput->M_in*pops->popsinput->N_tot*3);
     for (int n=0; n < Natoms; n++)
     {
       fi[n+M_indx] = f[n];

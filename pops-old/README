@@ -1,0 +1,44 @@
+This directory contains old source files that are no longer being updated.
+
+Simply go to the /src directory and do in the command line:
+
+rm ga_old
+make
+
+And 4 executables will be compiled.
+
+1) ga_old
+	This is the old fitting code
+2) calcz
+	This calculates error for already fitted parameter sets
+3) ga_ifc
+	This is the fitting code for force constants
+4) calcz_ifc
+	Same as calcz except for force constants
+
+------------------------------------------------------------------
+-This guide will cover how to use the force constant fitting code-
+------------------------------------------------------------------
+
+The same rules apply as before, with a few minor additions. See the example in /Si_tersoff_ifc
+
+1) We need an Alamode executable called "alm" in the directory that you run the fitting. 
+2) We now have interatomic force constant (IFC) configs. These are labeled in the CONFIGS file by containing an "IFC" in the configuration header. See the example in /Si_tersoff_ifc.
+   Configurations labeled with IFC will be used to calculate force constants.
+3) We have an Alamode input script for each processor, called "alm#.in" where "#" is the processor rank starting from 0. The input settings in the file are as follows:
+	a) PREFIX = FCS#, where # is the processor rank starting from 0.
+	b) DFILE = DFILE, where DFILE is the set of displacements you are using. This must match up with the order of IFC configs in the CONFIGS file.
+	c) FFILE = FFILE#, where # is the processor rank starting from 0.
+	d) The cutoff must correspond to the cutoff of the potential you are fitting? This makes sense, but I'm not sure if it's needed... Just do it for safety. 
+4) We have an FCREF file that contains the reference force constants from DFT. This file is formatted as seen in the silicon example. Just copy and paste the force constants from the Alamode
+   .fcs file and make sure there are no empty lines. You must copy the exact format!
+
+For the silicon example, run with:
+
+mpirun -np 1 ga_ifc 10101 9
+
+where 10101 is just the random number seed as before.
+
+Play around with changing the settings until you get it to work for your particular system.
+
+This is much slower than before, so use a smaller population size and less generations to speed up the process!

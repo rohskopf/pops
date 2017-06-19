@@ -1,0 +1,14 @@
+Example: Fit the Tersoff potential for Ge to forces, energies, and stresses of 8 atom DFT configurations.
+
+***** See the "README" file in every directory for a description of the process. *****
+
+The directories are organized as follows: A "1" at the beginning of a directory means that this is the first step. "2" means seconds step, etc.. 
+
+Folders included in this directory:
+
+1_dft: Getting DFT configurations and organizing them into the proper format is the first step.
+2_fitting: The next step is to fit using the configurations.
+
+NOTE: All .m files used in this example are written in Octave, not MATLAB. 
+
+

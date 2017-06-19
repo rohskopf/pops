@@ -1,0 +1,10 @@
+Generate volume configurations for fitting to pressure and energy at different volumes.
+
+Procedure:
+1) This is the same procedure as generating configurations to calculate the lattice parameter.
+	a) Just be sure to use more configurations around the calculated lattice parameter so that this area can be well captured in 		   fitting.
+	b) 20-30 configurations is sufficient (maybe even less).
+2) After generating the configurations and running them using "gen_moduli_config_files.sh" and "gen_moduli_configs.sh", use "getoutcars.sh" to organize all of the OUTCAR files into /outcar_house.
+3) Go into /outcar_house and run "gen_configs.m" to generate a CONFIGS file that contains all of the atom types, positions, forces, stresses, and cohesive energies for each configuration. 
+	a) Edit "gen_configs.m" accordingly.
+	b) Be sure to edit the "eatoms" variable in "gen_configs.m". This is the combined energy of all the INDIVIDUAL atoms in the 		   system, where we calculate the energy of an individual atom earlier.

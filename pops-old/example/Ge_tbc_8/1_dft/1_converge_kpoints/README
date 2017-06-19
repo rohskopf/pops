@@ -1,0 +1,11 @@
+*** VASP recommends to use even meshes (8x8x8) up to n=8. After that use 11x11x11 and odd number meshes (see VASP manual) ***
+
+*** For ENCUT, I have found it is sufficieny to use PREC = High. This increases the default cutoff by 25%. If you want to converge ENCUT on your own, you can follow this same procedure that we use for k-points ***
+
+The bash script "kpoints_sweep.sh" sweeps over different kpoint grid possibilities using the Monkhorst pack method. After each iteration, it calls the Octave script "getdata.m" to output the stresses, total pressure, forces, and energies into a "SUMMARY#" file where "#" is the #x#x# of kpoints used.
+
+Procedure:
+1) Make a POSCAR using the experimental lattice parameter and slightly vary the positions so that forces will be generated.
+2) Run kpoints_sweep.sh over the desired number of kpoints
+3) Check the SUMMARY# files to find the number of k-points that results in converged pressures and forces.
+4) Use these converged k-points to calculate the lattice parameter in the next step.

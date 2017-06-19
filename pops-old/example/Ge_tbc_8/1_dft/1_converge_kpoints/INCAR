@@ -1,0 +1,14 @@
+general:
+ System = diamond Ge
+ PREC = High
+ #ENCUT = 283 # energy cutoff (eV)
+ ISMEAR = -5 # Use -5 for semiconductors and insulators
+ ISTART = 0 # start job, no WAVECAR file
+ ICHARG=2   # charge, from atoms
+ INIWAV=1  # random initilization for wave function 
+ NELM = 40 # maximum of 40 electronic steps
+ NELMIN = 2 # minimum of 2 steps
+ NELMDL = -5 # no update of charge for 3 steps
+ EDIFF = 10E-4 # accuracy for electronic minimization
+ LWAVE = .FALSE. # write the wave in wavecar
+ LCHARGE = .FALSE. # write the charge density in chargecar

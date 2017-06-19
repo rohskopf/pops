@@ -1,0 +1,26 @@
+#!/bin/bash
+# Acceptance test for VASP
+# Assumes 8 procs and 1gb/core
+#PBS -N submit_all_jobs
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=1gb
+#PBS -l walltime=12:00:00
+#PBS -q iw-shared-6
+
+module purge
+module load gcc/4.9.0
+module load openmpi/1.8
+
+
+cd ${PBS_O_WORKDIR}
+
+LD_LIBRARY_PATH=/nv/hp13/arohskopf3/scratch/fitting/Si/64atoms/tvc_yuk:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/nv/hp13/arohskopf3/scratch/fitting/Si/64atoms/tvc_yuk:$LD_LIBRARY_PATH
+
+# Get the current seconds in the date and time for a seed
+#sec=$(date +"%S")
+
+# Submit a GA run, with the job ID as a seed
+./ga ${PBS_JOBID}
+
+

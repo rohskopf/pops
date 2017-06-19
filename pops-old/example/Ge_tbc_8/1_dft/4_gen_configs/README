@@ -1,0 +1,3 @@
+/volume contains volume configurations
+/randodisp_15 contains configurations where atoms are randomly displaced from equilibrium sites by 0.15 angstroms.
+/structure-generation contains an example of how to generate equilibrium lattice sites for "POSCAR_equilib"

@@ -1,0 +1,14 @@
+Using the converged number of k-points, we know calculate the equilibium lattice parameter (volume) using curve fitting.
+
+Procedure:
+1) Make a POSCAR with direct coordinates for your system. See the /files directory.
+2) Put the necessary VASP input files into /files.
+3) Use "gen_moduli_config_files.sh" to generate more directories for different configurations of different volumes (or lattice parameters). This script simply edits the box size in POSCAR.
+	a) The files will be labeled with a number corresponding to their lattice parameter.
+4) Use "gen_moduli_configs.sh"  to loop through all of these files and run VASP on the configuration. We only need a single electronic minimization (no ion movement) since we are interested in the energy of the configuration.
+5) Use "getoutcars.sh" to gather all of the OUTCAR files from all of the configurations and put them into an "outcar_house" directory.
+	a) The OUTCAR files will be labeled with a number corresponding to their lattice parameter.
+6) Once the OUTCARs are organized, go into the OUTCAR directory and run the Octave script "calc_lp.m". This script loops through all the OUTCARs and calculates the lattice parameter and gives a rough approximation to the bulk modulus.
+	a) Be sure to edit "calc_lp.m" to loop through the OUTCARs that you have generated.
+7) Use this lattice parameter as a basis for displacement configurations to generate forces in the next step.
+

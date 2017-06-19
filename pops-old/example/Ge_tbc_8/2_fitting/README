@@ -1,0 +1,25 @@
+Now that we have DFT quantities organized into a CONFIGS file, we can fit a potential to them.
+
+Procedure:
+1) The source code "ga.cpp" and necessary files are located in /files.
+	a) Use "compile.sh" to compile. See the manual in the first directory for more compiling instructions on how to built LAMMPS as a 	     shared library.
+
+2) Put all the desired volume and displacement configurations into CONFIGS. Be sure to not alter the format at all.
+	a) Do not alter the format at all! The spaces between lines and everything else matters in the fitting code.
+
+3) Edit "INPUT" to use the desired genetic algorithm and LAMMPS settings. See the manual for more information on INPUT.
+
+4) Execute a single fit by running the compiled code in the /files directory.
+	a) The results are in "LASTGEN". LASTGEN contains the best individual on each generation, and all of the individuals for the last 	     generation. If a fit has completed, the best fit is at the end of the file.
+
+5) The real power in fitting involves generating multiple fits (this explores many local minima in the search space).
+	a) Use "gentrialfiles.sh" to generate many directories that be separate fits.
+	b) Use "runtrials.sh" to run all of these fits.
+		- "runga.pbs" makes use of the job number as a random number seed.
+
+6) Similar to getting OUTCARs from VASP, use "getlastgens.sh" to organize all of the LASTGEN files into /lastgen_house.
+
+7) Use "gen_files.m" to loop through all LASTGEN files and make a BESTFITS file. BESTFITS contains the binary representation, parameter  	values, and Z values for all of the fits. You can parse through BESTFITS and find the lowest one, or use another method to find the 	  best parameter set for your purposes.
+	a) "gen_files.m" also produces an EXTRAINDS file, which contains all of the binary representations of best fit individuals. This 	    EXTRAINDS file can be used as inputs into another fit for refinement, if needed.
+
+	

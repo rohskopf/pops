@@ -1,0 +1,13 @@
+Generate displacement configurations with forces in order to fit to forces for various configurations.
+
+Procedure:
+1) Put the VASP input files + "randomize.m" and "POSCAR_equilib" into the /files directory.
+	a) "POSCAR_equilib" is a POSCAR file with the calculate lattice parameter and equilibium lattice sites for ions.
+	b) "randomize.m" uses "POSCAR_equilib" to generate a "POSCAR" with randomized atomic displacements. 
+		- Edit "randomize.m" to control the magnitude of randomized displacements about equilibrium
+2) Run "genconfigfiles.sh" to generate configuration directories using the input files in /files. This code copies a new configuration 	   	file a desired number of times, using "randomize.m" to make a randomized POSCAR.
+3) Run "runconfigs.sh" to run VASP for each configuration.
+4) Run "getoucars.sh" to get the OUTCAR files for each configuration and put them into /outcar_house.
+5) Use "gen_configs.m" in /outcar_house to generate a CONFIGS file. This file will be used for fitting.
+	a) Edit "gen_configs.m" accordingly.
+	b) Be sure to edit the "eatoms" variable in "gen_configs.m". This is the combined energy of all the INDIVIDUAL atoms in the 		   system, where we calculate the energy of an individual atom earlier.

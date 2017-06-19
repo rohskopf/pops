@@ -1,0 +1,43 @@
+THIS LINE IS IGNORED
+  generations: 1
+  extrainds: 0
+  population_size: 1
+  mutation_rate: 0.3
+  elite_percentage: 0.1
+  tabulated_parameters: 9
+  nontabulated_parameters: 0
+  M: 57
+  N: 64
+  force_weight: 0.1
+  energy_weight: 0
+  energy_shape_weight: 0.3
+  stress_weight: 0.3
+  pressure_weight: 0
+  pressure_shape_weight: 0
+  fc_weight: 0.2
+  fc3_weight: 0.1
+  fc_num: 3
+  fc3_num: 5
+  intervals: 1e-5 10 1e-5 1000 1e-5 100 1e-5 40 1e-5 10 1e-5 10 1e-5 5000 1e-5 10 1e-5 50000
+  decimal_place_accuracies: 4 4 4 4 4 4 2 4 2
+----------------------------------------LAMMPS SETUP COMMANDS
+    log none  
+    neighbor 1.0 multi  
+    boundary p p p  
+    units metal  
+    atom_style hybrid atomic charge
+    atom_modify map array  
+    ### Declare the box
+    lattice diamond 5.46
+    region box block 0 2 0 2 0 2 units lattice  
+    create_box 1 box  
+    ### Create atom type 1 in the box
+    create_atoms 1 random 64 1919191 NULL # Positions don't matter... just declare the memory
+    mass 1 28 # Si
+    compute P all pe  
+    compute S all pressure thermo_temp  
+----------------------------------------LAMMPS PAIR STYLE COMMANDS
+
+  pair_style tersoff
+  pair_coeff * * TEMPPOT{} Si
+----------------------------------------END OF FILE

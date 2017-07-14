@@ -42,6 +42,14 @@ namespace POPS_NS
         std::vector<double> Z_vec;
         double *Zf2_vec_arr;
         std::vector<double> Zf2_vec;
+        double *Ze2_vec_arr;
+        std::vector<double> Ze2_vec;
+        double *Ze2s_vec_arr;
+        std::vector<double> Ze2s_vec;
+        double *Zs2_vec_arr;
+        std::vector<double> Zs2_vec;
+        double *Z2fmax_vec_arr;
+        std::vector<double> Z2fmax_vec;
 
         int g; //generation number
         int gen_num;

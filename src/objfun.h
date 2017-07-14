@@ -37,6 +37,10 @@ namespace POPS_NS
     double *pi_s; // energies that will store the "e" scalars
 
     vector<double> sub_Zf2_vec;
+    vector<double> sub_Ze2_vec;
+    vector<double> sub_Ze2s_vec;
+    vector<double> sub_Zs2_vec;
+    vector<double> sub_Z2fmax_vec;
     
     
 

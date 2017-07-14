@@ -6,10 +6,10 @@
 #-----------------------------------------------
 
 # Enter the path to your LAMMPS directory
-LAMMPSDIR = ${HOME}/lammps/lammps-17Nov16/src
+LAMMPSDIR = ${HOME}/lammps/lammps-31Mar17/src
 
 # Enter path to the shared library (.so) file
-LAMMPSLIB = ~/lammps/lammps-17Nov16/src/liblammps_g++_openmpi.so
+LAMMPSLIB = ~/lammps/lammps-31Mar17/src/liblammps_g++_openmpi.so
 
 #-----------------------------------------------
 

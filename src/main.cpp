@@ -11,11 +11,13 @@ int main(int argc, char **argv)
   /* Initialize MPI */
   MPI_Init(&argc,&argv);
 
+  /* Begin a POPS instance */
   POPS *pops = new POPS(argc, argv);
 
+  /* Delete the memory */
   delete pops;
 
-  // Close MPI
+  /* Close MPI */
   int MPI_Comm_free(MPI_Comm *comm);
   MPI_Finalize();
 

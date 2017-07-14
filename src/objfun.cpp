@@ -4,6 +4,7 @@
 #include <sstream>
 #include <vector>
 #include <cmath>       /* round, floor, ceil, trunc */
+#include <algorithm>
 
 #include "popsinput.h"
 #include "popsmemory.h"
@@ -32,10 +33,15 @@ vector<double> Objfun::calcfitness(double sub_xpop_r[], int nepp)
   // Allocate memory for params
   pops->popsmemory->allocate(params, nepp);
   
-  // Prepare error quantities
+  // Prepare statistical quantities
   vector<double> sub_Z_vec;
   sub_Z_vec.resize(pop_size);
   sub_Zf2_vec.resize(pop_size);
+  sub_Ze2_vec.resize(pop_size);
+  sub_Ze2s_vec.resize(pop_size);
+  sub_Zs2_vec.resize(pop_size);
+  sub_Z2fmax_vec.resize(pop_size);
+  //sub_fmax_vec.resize(popsinput->Ntot);
   int i_indx = 0;
   for (int i=0; i < nepp/unknowns_tot; i++)
   {
@@ -496,6 +502,9 @@ double Objfun::calcz(double params[], int ind)
   double sum_p_diff_s=0;
   double Z_2_f = 0; // % error in forces
   double Z_2_e = 0; // % error in energies
+  double Z_2_e_s = 0; // % error in energies
+  double Z_2_s = 0; // % error in stress tensor components
+  vector<double> Z2f_contributions; // vector of contributions to Z_2_f
   // Denominators for normalization
   double sum_fio = 0;
   double sum_eio = 0;
@@ -742,7 +751,8 @@ double Objfun::calcz(double params[], int ind)
 
       if (denom != 0)
       {
-        Z_2_f = Z_2_f + (f_diff_mag/denom);    
+        Z_2_f = Z_2_f + (f_diff_mag/denom);
+        Z2f_contributions.push_back( f_diff_mag/denom );   
         //debug << fun << endl;
       }
 
@@ -787,7 +797,11 @@ double Objfun::calcz(double params[], int ind)
     debug << "sum_eio_s: " << sum_eio_s << endl;*/
     // Calculate percent error in energy
     double e_diff = eio[i] - ei[i];
+    double es_diff = eio_s[i] - ei_s[i];
     Z_2_e = Z_2_e + abs((e_diff)/(eio[i]));
+    if (eio_s[i] != 0.0){
+      Z_2_e_s = Z_2_e_s + abs((es_diff)/(eio_s[i]));
+    }
     /*debug << "e_md: " << e_md << endl;
     debug << "e_io: " << eio[i] << endl;
     debug << "sum_e_diff: " << sum_e_diff << endl;*/
@@ -814,6 +828,13 @@ double Objfun::calcz(double params[], int ind)
     debug << "md_zx: " << si_zx << endl;
     debug << "sum_s_diff: " << sum_s_diff << endl;*/
     sum_sio = sum_sio + pow(sio_xx,2) + pow(sio_yy,2) + pow(sio_zz,2) + pow(sio_xy,2) + pow(sio_yz,2) + pow(sio_zx,2);
+    // Sums for % error in stress
+    if (sio_xx != 0 && sio_yy != 0 && sio_zz != 0 && sio_xy !=0 && sio_yz != 0 && sio_zx != 0){
+      double s_mpe = abs((sio_xx - si_xx)/(sio_xx)) + abs((sio_yy - si_yy)/(sio_yy)) + abs((sio_zz - si_zz)/(sio_zz)) + \
+                     abs((sio_xy - si_xy)/(sio_xy)) + abs((sio_yz - si_yz)/(sio_yz)) + abs((sio_zx - si_zx)/(sio_zx));
+      Z_2_s = Z_2_s + s_mpe;
+    }
+    
     M_indx_s = M_indx_s+6;
 
     // Calculate portions of the pressure objective function (and covert from kB to B)
@@ -866,6 +887,8 @@ double Objfun::calcz(double params[], int ind)
   // Plug all of this into Z
   Z_2_f = ((Z_2_f)/(pops->popsinput->N_tot)) * 100;
   Z_2_e = ((Z_2_e)/(pops->popsinput->M_in)) * 100;
+  Z_2_e_s = ((Z_2_e_s)/(pops->popsinput->M_in)) * 100;
+  Z_2_s = ((Z_2_s)/((pops->popsinput->M_in)*6) ) * 100;
   double Z_f = ((sum_f_diff)/(sum_fio*pops->popsinput->N_tot));
   double Z_e = ((sum_e_diff)/(sum_eio*pops->popsinput->M_in));
   double Z_e_s ((sum_e_diff_s)/(sum_eio_s*pops->popsinput->M_in));
@@ -879,8 +902,17 @@ double Objfun::calcz(double params[], int ind)
   double w_p = pops->popsinput->w_p_in;
   double w_p_s = pops->popsinput->w_p_s_in;
   double Z = w_f*Z_f + w_e*Z_e + w_s*Z_s + w_e_s*Z_e_s + w_p*Z_p + w_p_s*Z_p_s;
-  
+
+  // Find the max of the Z2f contributions
+  double Z2fmax = *max_element(Z2f_contributions.begin(), Z2f_contributions.end()); 
+  Z2fmax = Z2fmax*100;
+
+  // Store the statistical values for extraction in the pops class 
   sub_Zf2_vec[ind] = Z_2_f;
+  sub_Ze2_vec[ind] = Z_2_e;
+  sub_Ze2s_vec[ind] = Z_2_e_s;
+  sub_Zs2_vec[ind] = Z_2_s;
+  sub_Z2fmax_vec[ind] = Z2fmax;
   /*debug << "sum_f_diff: " << sum_f_diff << endl;
   debug << "Z_f: " << Z_f << endl;
   debug << "sum_e_diff: " << sum_e_diff << endl;

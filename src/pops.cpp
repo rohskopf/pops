@@ -129,27 +129,61 @@ POPS::POPS(int narg, char **arg)
   // Get the sub error quantities per proc
   vector<double> sub_Z_vec = objfun->calcfitness(sub_xpop_r, nepp);
   vector<double> sub_Zf2_vec = objfun->sub_Zf2_vec;
+  vector<double> sub_Ze2_vec = objfun->sub_Ze2_vec;
+  vector<double> sub_Ze2s_vec = objfun->sub_Ze2s_vec;
+  vector<double> sub_Zs2_vec = objfun->sub_Zs2_vec;
+  vector<double> sub_Z2fmax_vec = objfun->sub_Z2fmax_vec;
 
   // Convert vectors to arrays for MPI_Gather
+  // Total Z
   int sub_Z_vec_size = sub_Z_vec.size();
   double sub_Z_vec_arr[sub_Z_vec_size];
   copy(sub_Z_vec.begin(), sub_Z_vec.end(), sub_Z_vec_arr);
+  // Force MPE
   int sub_Zf2_vec_size = sub_Zf2_vec.size();
   double sub_Zf2_vec_arr[sub_Zf2_vec_size];
   copy(sub_Zf2_vec.begin(), sub_Zf2_vec.end(), sub_Zf2_vec_arr);
+  // Energy MPE
+  int sub_Ze2_vec_size = sub_Ze2_vec.size();
+  double sub_Ze2_vec_arr[sub_Ze2_vec_size];
+  copy(sub_Ze2_vec.begin(), sub_Ze2_vec.end(), sub_Ze2_vec_arr);
+  // Energy shape MPE
+  int sub_Ze2s_vec_size = sub_Ze2s_vec.size();
+  double sub_Ze2s_vec_arr[sub_Ze2s_vec_size];
+  copy(sub_Ze2s_vec.begin(), sub_Ze2s_vec.end(), sub_Ze2s_vec_arr);
+  // Stress MPE
+  int sub_Zs2_vec_size = sub_Zs2_vec.size();
+  double sub_Zs2_vec_arr[sub_Zs2_vec_size];
+  copy(sub_Zs2_vec.begin(), sub_Zs2_vec.end(), sub_Zs2_vec_arr);
+  // Max Force Percent Error
+  int sub_Z2fmax_vec_size = sub_Z2fmax_vec.size();
+  double sub_Z2fmax_vec_arr[sub_Z2fmax_vec_size];
+  copy(sub_Z2fmax_vec.begin(), sub_Z2fmax_vec.end(), sub_Z2fmax_vec_arr);
 
   // Allocate memory for Z_vec_arr
   popsmemory->allocate(Z_vec_arr, popsinput->pop_size_in); 
   popsmemory->allocate(Zf2_vec_arr, popsinput->pop_size_in);
+  popsmemory->allocate(Ze2_vec_arr, popsinput->pop_size_in);
+  popsmemory->allocate(Ze2s_vec_arr, popsinput->pop_size_in);
+  popsmemory->allocate(Zs2_vec_arr, popsinput->pop_size_in);
+  popsmemory->allocate(Z2fmax_vec_arr, popsinput->pop_size_in);
 
   // Gather the sub_Z_vec vectors into Z_vec
   //cout << "Gather parameters" << endl;
   MPI_Gather(sub_Z_vec_arr,popsinput->pop_size_in/procs, MPI::DOUBLE, Z_vec_arr, popsinput->pop_size_in/procs, MPI::DOUBLE, 0, MPI_COMM_WORLD);
   MPI_Gather(sub_Zf2_vec_arr,popsinput->pop_size_in/procs, MPI::DOUBLE, Zf2_vec_arr, popsinput->pop_size_in/procs, MPI::DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Gather(sub_Ze2_vec_arr,popsinput->pop_size_in/procs, MPI::DOUBLE, Ze2_vec_arr, popsinput->pop_size_in/procs, MPI::DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Gather(sub_Ze2s_vec_arr,popsinput->pop_size_in/procs, MPI::DOUBLE, Ze2s_vec_arr, popsinput->pop_size_in/procs, MPI::DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Gather(sub_Zs2_vec_arr,popsinput->pop_size_in/procs, MPI::DOUBLE, Zs2_vec_arr, popsinput->pop_size_in/procs, MPI::DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Gather(sub_Z2fmax_vec_arr,popsinput->pop_size_in/procs, MPI::DOUBLE, Z2fmax_vec_arr, popsinput->pop_size_in/procs, MPI::DOUBLE, 0, MPI_COMM_WORLD);
   //cout << "Parameters gathered" << endl;
   // Resize Z_vec to be same size as Z_vec_arr
   Z_vec.resize(popsinput->pop_size_in);
   Zf2_vec.resize(popsinput->pop_size_in);
+  Ze2_vec.resize(popsinput->pop_size_in);
+  Ze2s_vec.resize(popsinput->pop_size_in);
+  Zs2_vec.resize(popsinput->pop_size_in);
+  Z2fmax_vec.resize(popsinput->pop_size_in);
   // Convert Z_vec_arr to Z_vec
   if (rank == 0)
   {
@@ -158,6 +192,10 @@ POPS::POPS(int narg, char **arg)
       //cout << Z_vec_arr[i] << endl;
       Z_vec[i] = Z_vec_arr[i];
       Zf2_vec[i] = Zf2_vec_arr[i];
+      Ze2_vec[i] = Ze2_vec_arr[i];
+      Ze2s_vec[i] = Ze2s_vec_arr[i];
+      Zs2_vec[i] = Zs2_vec_arr[i];
+      Z2fmax_vec[i] = Z2fmax_vec_arr[i];
     }
 
     // Run the rest of the GA
@@ -170,6 +208,9 @@ POPS::POPS(int narg, char **arg)
   //cout << "Deallocate Z_vec_arr" << endl;
   popsmemory->deallocate(Z_vec_arr);
   popsmemory->deallocate(Zf2_vec_arr);
+  popsmemory->deallocate(Ze2_vec_arr);
+  popsmemory->deallocate(Ze2s_vec_arr);
+  popsmemory->deallocate(Zs2_vec_arr);
 
   g++;
   }

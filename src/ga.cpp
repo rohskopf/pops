@@ -169,7 +169,7 @@ void Ga::initialize()
   pops->popsmemory->allocate(child2, pops->ga->length);
   pops->popsmemory->allocate(children, pops->popsinput->pop_size_in, pops->ga->length);
 
-  if (pops->rank == 0) fprintf(history, "Generation      Z          %% Force Error            \n");
+  if (pops->rank == 0) fprintf(history, "Generation      Z      Force MPE (%%)  Energy MPE (%%)   Energy shape MPE (%%)  Stress MPE (%%)  Total Max Force Error (%%)\n");
   
 
 } //intialize()
@@ -353,6 +353,10 @@ void Ga::selection()
   /* Get the necessary variables required for this function */
   vector<double> Z_vec = pops->Z_vec;
   vector<double> Zf2_vec = pops->Zf2_vec;
+  vector<double> Ze2_vec = pops->Ze2_vec;
+  vector<double> Ze2s_vec = pops->Ze2s_vec;
+  vector<double> Zs2_vec = pops->Zs2_vec;
+  vector<double> Z2fmax_vec = pops->Z2fmax_vec;
   int pop_size = pops->popsinput->pop_size_in; 
   int unknowns_tot = pops->ga->unknowns_tot;
   double eliteperc = pops->popsinput->eliteperc_in;
@@ -368,7 +372,9 @@ void Ga::selection()
     end(sorted_indices),
     [&](int i1, int i2) { return Z_vec[i1] < Z_vec[i2]; } );
 
-  //cout << "Z_vec[0]: " << Z_vec[0] << endl;
+  int bestindx = sorted_indices[0];
+  /*cout << "bestindx: " << bestindx << endl;
+  cout << "Z_vec[bestindx]: " << Z_vec[bestindx] << endl;*/
 
   // Now "sorted_indices" contains the indices of the sorted Z_vec, but we still have to sort Z_vec:
   sort(Z_vec.begin(), Z_vec.end(), [](double a, double b) {
@@ -376,10 +382,21 @@ void Ga::selection()
   });
   //cout << "Z_vec[0]: " << Z_vec[0] << endl;
   // Sort Zf2_vec
-  sort(Zf2_vec.begin(), Zf2_vec.end(), [](double a, double b) {
+  /*sort(Zf2_vec.begin(), Zf2_vec.end(), [](double a, double b) {
     return b > a;
   });
-  // Now Z_vec is sorted.
+  // Sort Ze2_vec
+  sort(Ze2_vec.begin(), Ze2_vec.end(), [](double a, double b) {
+    return b > a;
+  });
+  // Sort Ze2s_vec
+  sort(Ze2s_vec.begin(), Ze2s_vec.end(), [](double a, double b) {
+    return b > a;
+  });
+  // Sort Zs2_vec
+  sort(Zs2_vec.begin(), Zs2_vec.end(), [](double a, double b) {
+    return b > a;
+  });*/
 
   //DEBUG
   //cout << "Z VALUES" << endl;
@@ -416,7 +433,8 @@ void Ga::selection()
   /////////////////////////////////////////////////////////
   /////// MORE DATA ANALYSIS FOR OUTPUT CAN GO HERE ///////
   /////////////////////////////////////////////////////////
-  fprintf(history, "%d             %.10f         %.6f                       \n", pops->g, Z_vec[0], Zf2_vec[0]);
+  fprintf(history, "%d             %.6f         %.2f           %.2f          %.2f         %.2f           %.2f\n", \
+                  pops->g, Z_vec[0], Zf2_vec[bestindx], Ze2_vec[bestindx], Ze2s_vec[bestindx], Zs2_vec[bestindx], Z2fmax_vec[bestindx]);
 
   // Print the best individual genes
   for (int i=0; i <= length-1; i++)

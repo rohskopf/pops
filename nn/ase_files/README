@@ -1,0 +1,2 @@
+1) Put neighborlist2.py in ase/
+2) Put nn.py in ase/calculators/

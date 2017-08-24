@@ -1,7 +1,10 @@
 main.py is the main code - just edit it accordingly and do:
 	python main.py
 
+UPDATES (8/24/2017):
 Before running: Unpack the /data file:
     tar -xvzf data.tar.gz
 
 The code now searches for EVERY .xml file inside this directory, regardless of what folder it is in.
+
+Can use the ASE default neighborlist

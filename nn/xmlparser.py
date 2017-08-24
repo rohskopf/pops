@@ -127,7 +127,7 @@ class XMLParser():
         allForces = []
         allEnergies = []
         for f in range(0,numFiles):
-            #if f >= 1000:
+            #if f >= 1:
             #    break
             if f % 100 == 0:
                 print('Parsing %dth XML file' % (f))

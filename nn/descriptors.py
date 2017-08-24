@@ -8,7 +8,7 @@ N = number of atoms in configuration
 """
 
 import numpy as np
-from ase.neighborlist2 import NeighborList
+from ase.neighborlist import NeighborList
 
 # Inputs will need to be rc, atoms, atomnumber
 class Descriptors():
@@ -42,7 +42,7 @@ class Descriptors():
             fcList.append(self.fc_calc(rijList[i]))
         return fcList
 
-    # G1 calculator for a single eta
+    # G1 calculator for a single atom and single eta
     def G1_calc(self,rijList, eta, fcList):
         rc = self.rc
         G1 = 0.
@@ -60,7 +60,6 @@ class Descriptors():
 
     # Build the feature vector and return it (for a single atom)
     def calculate(self, rijList):
-        rc = self.rc
         #cutoffs = [self.rc]
         fcList = self.fcList_calc(rijList)
         G1List = self.G1List_calc(rijList, self.etas, fcList)
@@ -68,7 +67,7 @@ class Descriptors():
 
     # Build feature vectors for all atoms in the configuration
     def calculate_system(self, atoms):
-        rc = self.rc
+        rc = self.rc/2. # Need to divide by 2 to get proper cutoff in ASE
         pos = atoms.positions
         N = len(pos)
         cutoffs = [rc] * N # Cutoffs for every atom

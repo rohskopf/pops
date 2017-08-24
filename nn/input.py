@@ -5,7 +5,6 @@ from ase import Atoms
 from ase import units
 #from ase.calculators.nn import NeuralNet
 from ase.visualize import view
-from ase.neighborlist2 import NeighborList
 
 """
 This class prepares everything based on user input and CONFIGS

@@ -6,7 +6,6 @@ from ase import Atoms
 from ase import units
 #from ase.calculators.nn import NeuralNet
 from ase.visualize import view
-from ase.neighborlist2 import NeighborList
 
 import tensorflow as tf
 from network import Network
@@ -91,7 +90,7 @@ def write_weights(topology, values):
 
 """ Declare input parameters """
 rc = 2.0
-etas = [0.05, 1., 2., 4., 8., 20., 40., 80.]
+etas = [0.001, 0.01, 0.05, 1.0, 2.0, 5.0]
 G = len(etas)
 
 """ Build the network"""

@@ -1,5 +1,6 @@
 import numpy as np
 from descriptors import Descriptors
+from xmlparser import XMLParser
 from ase import Atoms
 from ase import units
 #from ase.calculators.nn import NeuralNet
@@ -13,70 +14,27 @@ This class prepares everything based on user input and CONFIGS
 class Input():
     # Initializer
     def __init__(self):
-        pass
+        parser = XMLParser()
+        allQuantities = parser.getAllQuantities()
+        self.allBox = allQuantities[0]
+        self.allAtomTypes = allQuantities[1]
+        self.allPositions = allQuantities[2]
+        self.allForces = allQuantities[3]
+        self.allEnergies = allQuantities[4]
 
     # print() overloader
     def __repr__(self):
         return("input!")
 
-    def readconfigs(self):
-        """ Function read CONFIGS file """
-        fh = open('CONFIGS', 'r')
-        l = fh.readline()
-        # Loop through entire file
-        configcount = 0
-        allnums = []
-        allpos = []
-        allbox = []
-        allU = []
-        while (l != ''):
-            if "CONFIG" in l:
-                configcount += 1
-                nums = []
-                pos = []
-                box = []
-                while "/" not in l:
-                    l = fh.readline()
-                    # Take the \n out
-                    if "/" not in l:
-                        l = l[:-2]
-                        #print(l)
-                        vals = [float(x) for x in l.split()]
-                        num = vals[0]
-                        #print ("num: %d" % num)
-                        nums.append(num)
-                        x,y,z = vals[1], vals[2], vals[3]
-                        pos.append((x,y,z))
-                allnums.append(nums)
-                allpos.append(pos)
-                # Now get the cell 
-                l = fh.readline() # potential energy
-                U = float(l)
-                allU.append(U)
-                l = fh.readline() # stress tensor
-                l = fh.readline() # total pressure
-                l = fh.readline() # box
-                vals = [float(x) for x in l.split()]
-                xx,yy,zz,xy,xz,yz = vals[0], vals[1], vals[2], vals[3], vals[4], vals[5]
-                box.append((xx,0,0))
-                box.append((xy,yy,0))
-                box.append((xz,yz,zz))
-                allbox.append(box)
-
-            l = fh.readline()
-
-        return (allnums, allpos, allbox, allU)
 
     def storeQuantities(self):
-        stuff = self.readconfigs()
-        allU = stuff[3]
-        return (allU)
+        allEnergies = self.allEnergies
+        return (allEnergies)
 
     def storeAtoms(self):
-        stuff = self.readconfigs()
-        allnums = stuff[0]
-        allpos = stuff[1]
-        allbox = stuff[2]
+        allnums = self.allAtomTypes
+        allpos = self.allPositions
+        allbox = self.allBox
         numConfigs = len(allpos)
         print("Found %d configs" % (numConfigs))
 
@@ -87,6 +45,10 @@ class Input():
             numbers = allnums[config]
             pos = allpos[config]
             box = allbox[config]
+            pos = np.array(pos)
+            box = np.array(box)
+            # Convert direct coordinates to cartesian
+            pos = np.matmul(pos, box)
             atoms = Atoms(numbers = numbers,
                   positions= pos, 
                   cell=box,
@@ -100,15 +62,19 @@ class Input():
 
     def storeDescriptors(self, rc, etas):
         allAtoms = self.storeAtoms()
-        D = Descriptors(atype=1, etas=etas)
+        D = Descriptors(atype=1, etas=etas, rc=rc)
         # Get number of configs
         M = len(allAtoms)
+        #print(M)
         # Loop through configs
         print("Calculating descriptors for all configs...")
         allGList = []
         for m in range(0,M):
+            if m % 10 == 0:
+                print('Calculating descriptors for config %d' % (m))
             atoms = allAtoms[m]
-            configGList = D.calculate_system(atoms, rc)
+            configGList = D.calculate_system(atoms)
+            #print(np.shape(configGList))
             allGList.append(configGList)
 
         print("Calculated descriptors for all configs")

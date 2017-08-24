@@ -13,9 +13,10 @@ from ase.neighborlist2 import NeighborList
 # Inputs will need to be rc, atoms, atomnumber
 class Descriptors():
     # Initializer
-    def __init__(self, atype, etas):
+    def __init__(self, atype, etas, rc):
         self.atype = atype
         self.etas = etas
+        self.rc = rc
 
     # print() overloader
     def __repr__(self):
@@ -25,7 +26,8 @@ class Descriptors():
     #def nl_calc(self, rc, atoms, 
 
     # Cutoff calculator
-    def fc_calc(self,rij, rc):
+    def fc_calc(self,rij):
+        rc = self.rc
         if (rij <= rc):
             fc = 0.5*(np.cos(np.pi*rij/rc) + 1)
         else:
@@ -33,20 +35,22 @@ class Descriptors():
         return fc
 
     # Cutoff list calculator
-    def fcList_calc(self,rijList, rc):
+    def fcList_calc(self,rijList):
+        rc = self.rc
         fcList = []
         for i in range(0, len(rijList)):
-            fcList.append(self.fc_calc(rijList[i], rc))
+            fcList.append(self.fc_calc(rijList[i]))
         return fcList
 
-    # G1 calculator
+    # G1 calculator for a single eta
     def G1_calc(self,rijList, eta, fcList):
+        rc = self.rc
         G1 = 0.
         for i in range(0, len(rijList)): # loop over neighbors j
-            G1 += np.exp(-eta*rijList[i]**2)*fcList[i]
+            G1 += np.exp((-eta*rijList[i]**2)/(rc**2))*fcList[i]
         return G1
 
-    # G1 list creator (feature vector)
+    # G1 list creator (feature vector for a single atom, for all etas)
     def G1List_calc(self,rijList, etas, fcList):
         G1List = []
         for i in range(0, len(etas)): # loop over neighbors j
@@ -55,14 +59,16 @@ class Descriptors():
         return G1List
 
     # Build the feature vector and return it (for a single atom)
-    def calculate(self, rijList, rc):
+    def calculate(self, rijList):
+        rc = self.rc
         #cutoffs = [self.rc]
-        fcList = self.fcList_calc(rijList, rc)
+        fcList = self.fcList_calc(rijList)
         G1List = self.G1List_calc(rijList, self.etas, fcList)
         return G1List
 
     # Build feature vectors for all atoms in the configuration
-    def calculate_system(self, atoms, rc):
+    def calculate_system(self, atoms):
+        rc = self.rc
         pos = atoms.positions
         N = len(pos)
         cutoffs = [rc] * N # Cutoffs for every atom
@@ -72,7 +78,6 @@ class Descriptors():
         for a in range(0,N):
             indices, offsets = nl.get_neighbors(a)
             atompos = pos[a]
-            rc = cutoffs[a]
             #print("atompos: ")
             #print(atompos)
             neighpos = []
@@ -80,9 +85,13 @@ class Descriptors():
                 #print(atoms.positions[i] + np.dot(offset, atoms.get_cell()))
                 neigh = atoms.positions[i] + np.dot(offset, atoms.get_cell())
                 neighpos.append(neigh)
-                """print("neighpos: ")
-                print(neighpos)"""
-                #print(len(neighpos))
+                
+                """
+                if a == 0:
+                #print("neighpos: ")
+                #print(neighpos)
+                print(len(neighpos))
+                """
 
             """ Now we have the neighbors of the atom, let's loop through calculate descriptors for each neighbor """
             # Calculate fc list and G1_vec
@@ -98,9 +107,18 @@ class Descriptors():
                 #print(rij)
                 rijList.append(rij)
 
+
             # Make G1List for this group of atoms
-            G1List = self.calculate(rijList, rc)
-            #print(G1List)
+            G1List = self.calculate(rijList)
+            """
+            if a == 0:
+                print(neighpos)
+                print(rijList)
+                print(G1List)
+            """
             configG1List.append(G1List)
 
+        # Swap the axes so we have a (MxGxN) list 
+        configG1List = np.swapaxes(configG1List, 0, 1)
+        #print(np.shape(configG1List))
         return(configG1List)

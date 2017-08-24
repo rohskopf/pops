@@ -4,127 +4,68 @@ import tensorflow as tf
 class Network():
 
     # Initializer
-    def __init__(self, topology, configs, xs):
+    def __init__(self, topology, activations):
         self.topology = topology
-        self.configs = configs
-        self.xs = xs
+        self.activations = activations
+        # We need to initialize variables here so that we have a fixed amount
+        # Create list of variables
+        self.w_list = []
+        self.b_list = []
+        # Loop over connections
+        for c in range(0,len(topology)-1):
+            in_size = topology[c]
+            out_size = topology[c+1]
+            weights = tf.Variable(tf.random_normal([out_size, in_size]))
+            biases = tf.Variable(tf.random_normal([out_size, 1]))
+            self.w_list.append(weights)
+            self.b_list.append(biases)
+       
 
     # print() overloader
     def __repr__(self):
         return "%s" % (self.topology)
 
-    def add_layer(self,configs, inputs, in_size, out_size, activation_function):
+    # Return energy for an entire config
+    def return_energy(self):
+        return tf.reduce_sum(self.energies)
 
-        # Define variables for this layer
-        W = tf.Variable(tf.random_normal([out_size, in_size]))
-        b = tf.Variable(tf.random_normal([out_size,1]))
+    def add_connection(self,weights, biases,inputs, in_size, out_size, activation):
 
-        # Loop through all configs and make a stacked output
-        outList = []
-        for i in range(0,configs):
-            x = inputs[i]
-            Wx = tf.matmul(W,x)
-            Wx_plus_b = Wx + b
-            outList.append(Wx_plus_b)
-        outStacked = tf.stack(outList)
+        #print(weights)
+        #print(biases)
 
-        if activation_function is None:
-            outputs = outStacked
-        else:
-            outputs = activation_function(outStacked)
+        Wx = tf.matmul(weights,inputs)
+        Wx_plus_b = Wx + biases
+
+        if activation is 'l':
+            outputs = Wx_plus_b
+        if activation is 't':
+            outputs = tf.tanh(Wx_plus_b)
         return outputs
 
-    def makeNet(self):
+    def makeNet(self, xs):
 
-        add_layer = self.add_layer
         topology = self.topology
-        configs = self.configs
-        xs = self.xs
+        activations = self.activations
+
+        add_connection = self.add_connection
+
+        w_list = self.w_list
+        b_list = self.b_list
+        #print(w_list)
+        #print(b_list)
+        C = len(topology)-1 # Number of connections
     
-        print('%d configs\n' % (configs) )
-        # Add the connections
-        layerdict = {} # Think of this as a connection dictionary!!!
-        cs = {}
+        # Make a dictionary of layer output values
+        layerdict = {}
         # Add first layer (inputs)
-        layerdict[0] = add_layer(configs, xs, topology[0], topology[1], activation_function=tf.tanh)
-        rest = topology[1:]
-        # Add hidden layers
-        Nh = len(rest)-1
-        print('%d hidden layers\n' % (Nh) )
-        for l in range(0,Nh-1):
-            #print('%d %d' % (rest[l], rest[l+1]) )
-            layerdict[l+1] = add_layer(configs, layerdict[l], rest[l], rest[l+1], activation_function=tf.tanh)
+        layerdict[0] = add_connection(w_list[0], b_list[0],xs, topology[0], topology[1], activation=activations[0])
+        # Loop through other connections
+        for c in range(1,C):
+            layerdict[c] = add_connection(w_list[c], b_list[c],layerdict[c-1], topology[c], topology[c+1], activation=activations[c])
 
-        # Add output layer
-        layerdict[len(rest)-1] = add_layer(configs, layerdict[len(rest)-2], rest[len(rest)-2], rest[len(rest)-1], activation_function=None)
+        lastlayer = tf.squeeze(layerdict[C-1])
+        
+        energy = tf.reduce_sum(lastlayer)
 
-        lastlayer = tf.squeeze(layerdict[len(rest)-1])
-
-        return lastlayer
-
-    def add_layer_eval(self,weights,biases,configs, inputs, in_size, out_size, activation_function):
-
-
-        # Define variables for this layer
-        W = tf.constant(weights)
-        b = tf.constant(biases)
-
-        # Loop through all configs and make a stacked output
-        outList = []
-        for i in range(0,configs):
-            x = inputs[i]
-            Wx = tf.matmul(W,x)
-            Wx_plus_b = Wx + b
-            outList.append(Wx_plus_b)
-        outStacked = tf.stack(outList)
-
-        if activation_function is None:
-            outputs = outStacked
-        else:
-            outputs = activation_function(outStacked)
-        return outputs
-
-    def makeNetEval(self, params):
-
-        add_layer_eval = self.add_layer_eval
-        topology = self.topology
-        configs = self.configs
-        xs = self.xs
-    
-        print('%d configs\n' % (configs) )
-        # Add the connections
-        layerdict = {} # Think of this as a connection dictionary!!!
-        # Add first layer (inputs)
-        weightIndx = 0
-        biasIndx = 2
-        cParams = params[weightIndx:biasIndx]
-        weights = cParams[0]
-        biases = cParams[1]
-        #print(cParams)
-        layerdict[0] = add_layer_eval(weights,biases,configs, xs, topology[0], topology[1], activation_function=tf.tanh)
-        rest = topology[1:]
-        # Add hidden layers
-        Nh = len(rest)-1
-        print('%d hidden layers\n' % (Nh) )
-        for l in range(0,Nh-1):
-            weightIndx = weightIndx+2
-            biasIndx = biasIndx+2
-            cParams = params[weightIndx:biasIndx]
-            weights = cParams[0]
-            biases = cParams[1]
-            #print(cParams)
-            #print('%d %d' % (rest[l], rest[l+1]) )
-            layerdict[l+1] = add_layer_eval(weights,biases,configs, layerdict[l], rest[l], rest[l+1], activation_function=tf.tanh)
-
-        # Add output layer
-        weightIndx = weightIndx+2
-        biasIndx = biasIndx+2
-        cParams = params[weightIndx:biasIndx]
-        weights = cParams[0]
-        biases = cParams[1]
-        #print(cParams)
-        layerdict[len(rest)] = add_layer_eval(weights,biases,configs, layerdict[len(rest)-2], rest[len(rest)-2], rest[len(rest)-1], activation_function=None)
-
-        lastlayer = tf.squeeze(layerdict[len(rest)])
-
-        return lastlayer
+        return energy

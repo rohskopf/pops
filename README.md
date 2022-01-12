@@ -2,4 +2,4 @@
 ![Alt Text](https://github.com/rohskopf/pops/blob/master/pops-logo.png)
 
 ### Manual
-Please refer to the online manual: [POPS manual](https://pops.gatech.edu/doku.php?id=start).
+The manual lives here: [https://pops.gatech.edu](https://pops.gatech.edu/doku.php?id=start).
